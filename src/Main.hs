@@ -23,21 +23,25 @@ main = do
     setForeignEncoding utf8
     hakyll $ do
 
-    match "images/*" $ do
+      match "img/*" $ do
         route   idRoute
         compile copyFileCompiler
 
-    match "css/*" $ do
+      match "js/*" $ do
+        route   idRoute
+        compile copyFileCompiler
+
+      match "css/*" $ do
         route   idRoute
         compile compressCssCompiler
 
-    create ["css/style.css"] $ do
+      create ["css/style.css"] $ do
         route idRoute
         compile $ do
             items <- loadAll "css/_*"
             makeItem $ concatMap (compressCss . itemBody) (items :: [Item String])
 
-    match "posts/*" $ do
+      match "posts/*" $ do
         route indexRoute
         compile $ pandocCompiler
             >>= loadAndApplyTemplate "templates/post.html"    postCtx
@@ -45,15 +49,15 @@ main = do
             >>= relativizeUrls
             >>= slashUrlsCompiler
         
-    create ["rss.xml"] $ do
+      create ["rss.xml"] $ do
         route idRoute
         compile $ do
             let feedCtx = postCtx `mappend` constField "description" ""
             posts <- fmap (take 10) . recentFirst =<< loadAll "posts/*"
             renderRss myFeedConfiguration feedCtx posts
 
-    match "index.html" $ do
-        route idRoute
+      match "index.md" $ do
+        route $ constRoute "index.html" 
         compile $ do
             posts <- recentFirst =<< loadAll "posts/*"
             let indexCtx =
@@ -61,13 +65,13 @@ main = do
                     constField "title" "Home"                `mappend`
                     defaultContext
 
-            getResourceBody
+            pandocCompiler
                 >>= applyAsTemplate indexCtx
                 >>= loadAndApplyTemplate "templates/default.html" indexCtx
                 >>= relativizeUrls
                 >>= slashUrlsCompiler
 
-    match "templates/*" $ compile templateCompiler
+      match "templates/*" $ compile templateCompiler
 
 --------------------------------------------------------------------------------
 

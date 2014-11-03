@@ -1,0 +1,11 @@
+name:                purescript-site
+version:             0.1.0.0
+author:              Phil Freeman
+maintainer:          paf31@cantab.net
+build-type:          Simple
+cabal-version:       >=1.10
+
+executable purescript-site
+  main-is:             Main.hs
+  build-depends:       base >=4.7 && <4.8, filepath ==1.3.0.2, hakyll ==4.6.0.0
+  default-language:    Haskell2010
